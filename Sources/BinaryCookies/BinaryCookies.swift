@@ -132,7 +132,7 @@ public class Cookie: BinaryCodable {
     public var port: Int16?
     public var name: String!
     public var path: String!
-    public var value: String!
+    public var value: Data!
     public var comment: String?
     public var commentURL: String?
     public let flags: Flags
@@ -196,8 +196,7 @@ public class Cookie: BinaryCodable {
                 path = String(data: pathData, encoding: .utf8)!
             }
             else if offset == valueOffset {
-                let valueData = try container.decode(length: length)
-                value = String(data: valueData, encoding: .utf8)!
+                value = try container.decode(length: length)
             }
             else if offset == commentOffset, offset > 0 {
                 let commentData = try container.decode(length: length)
@@ -261,7 +260,7 @@ public class Cookie: BinaryCodable {
         try container.encode(url, encoding: .utf8, terminator: nil)
         try container.encode(name, encoding: .utf8, terminator: nil)
         try container.encode(path, encoding: .utf8, terminator: nil)
-        try container.encode(value, encoding: .utf8, terminator: nil)
+        try container.encode(sequence: self.value)
     }
 
     private let fixedByteSize: Int32 = 56
@@ -274,6 +273,6 @@ public class Cookie: BinaryCodable {
                Int32(url.utf8.count) +
                Int32(name.utf8.count) +
                Int32(path.utf8.count) +
-               Int32(value.utf8.count)
+               Int32(value.count)
     }
 }
